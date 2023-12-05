@@ -21,7 +21,7 @@ See https://pydantic-docs.helpmanual.io/usage/settings/
 Note, complex types like lists are read as json-encoded strings.
 """
 
-import tomllib
+import toml
 from functools import cached_property
 from pathlib import Path
 from typing import Literal
@@ -30,8 +30,7 @@ from pydantic import AnyHttpUrl, EmailStr, PostgresDsn, computed_field
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 PROJECT_DIR = Path(__file__).parent.parent.parent
-with open(f"{PROJECT_DIR}/pyproject.toml", "rb") as f:
-    PYPROJECT_CONTENT = tomllib.load(f)["tool"]["poetry"]
+PYPROJECT_CONTENT = toml.load(f"{PROJECT_DIR}/pyproject.toml")["tool"]["poetry"]
 
 
 class Settings(BaseSettings):
