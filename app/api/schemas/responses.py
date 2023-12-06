@@ -20,6 +20,5 @@ class UserResponse(BaseResponse):
     email: EmailStr
 
 
-
 class ResponseErrorSchema(BaseModel):
     message: str

@@ -17,7 +17,7 @@ class WordPgRepo:
 
     _session_factory: Callable[[], AbstractAsyncContextManager["AsyncSession"]]
 
-    async def get(self, word: str) -> WordEntity:
+    async def get(self, word: str, sl: str, tl: str) -> WordEntity:
         """Get word entity from database.
 
         For now just take all known relations.
@@ -34,10 +34,13 @@ class WordPgRepo:
                 .where(WordModel.word == word)
             )
 
+            if sl != "auto":
+                query = query.where(WordModel.language == sl)
+
             result = await session.execute(query)
             word = result.scalars().first()
 
-            return WordEntity.model_validate(word)
+            return WordEntity.model_validate(word) if word else None
 
 
 # from app.core.session import get_context

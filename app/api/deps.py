@@ -8,8 +8,9 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core import config, security
-from app.core.session import async_session
+from app.core.session import async_session, get_context
 from app.models import User
+from app.repo.pg.word import WordPgRepo
 
 reusable_oauth2 = OAuth2PasswordBearer(tokenUrl="auth/access-token")
 
@@ -52,3 +53,7 @@ async def get_current_user(
     if not user:
         raise HTTPException(status_code=404, detail="User not found.")
     return user
+
+
+def get_word_repo() -> "WordPgRepo":
+    return WordPgRepo(_session_factory=get_context)
