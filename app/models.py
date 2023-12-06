@@ -14,10 +14,11 @@ alembic revision --autogenerate -m "migration_name"
 alembic upgrade head
 """
 import uuid
+from datetime import datetime
 
-from sqlalchemy import String
+from sqlalchemy import Column, DateTime, ForeignKey, Integer, String, Text
 from sqlalchemy.dialects.postgresql import UUID
-from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
+from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship
 
 
 class Base(DeclarativeBase):
@@ -34,15 +35,6 @@ class User(Base):
         String(254), nullable=False, unique=True, index=True
     )
     hashed_password: Mapped[str] = mapped_column(String(128), nullable=False)
-
-
-from datetime import datetime
-
-from sqlalchemy import (Boolean, Column, DateTime, ForeignKey, Integer, String,
-                        Text)
-from sqlalchemy.orm import declarative_base, relationship
-
-Base = declarative_base()
 
 
 class Word(Base):
