@@ -8,10 +8,10 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.api import deps
+from app.api.schemas.requests import RefreshTokenRequest
+from app.api.schemas.responses import AccessTokenResponse
 from app.core import config, security
 from app.models import User
-from app.schemas.requests import RefreshTokenRequest
-from app.schemas.responses import AccessTokenResponse
 
 router = APIRouter()
 

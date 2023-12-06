@@ -4,11 +4,8 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.main import app
 from app.models import User
-from app.tests.conftest import (
-    default_user_email,
-    default_user_id,
-    default_user_password_hash,
-)
+from app.tests.conftest import (default_user_email, default_user_id,
+                                default_user_password_hash)
 
 
 async def test_read_current_user(client: AsyncClient, default_user_headers):

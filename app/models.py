@@ -36,9 +36,11 @@ class User(Base):
     hashed_password: Mapped[str] = mapped_column(String(128), nullable=False)
 
 
-from sqlalchemy import Column, Integer, String, Boolean, Text, ForeignKey, DateTime
-from sqlalchemy.orm import declarative_base, relationship
 from datetime import datetime
+
+from sqlalchemy import (Boolean, Column, DateTime, ForeignKey, Integer, String,
+                        Text)
+from sqlalchemy.orm import declarative_base, relationship
 
 Base = declarative_base()
 

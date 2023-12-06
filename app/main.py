@@ -5,6 +5,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.middleware.trustedhost import TrustedHostMiddleware
 
 from app.api.api import api_router
+from app.api.v1.factory import create_app
 from app.core import config
 
 app = FastAPI(
@@ -27,3 +28,8 @@ app.add_middleware(
 
 # Guards against HTTP Host Header attacks
 app.add_middleware(TrustedHostMiddleware, allowed_hosts=config.settings.ALLOWED_HOSTS)
+
+
+sub_app = create_app(config.settings.PROJECT_NAME, config.settings.VERSION)
+sub_app_prefix = "/api/v1"
+app.mount(sub_app_prefix, sub_app)

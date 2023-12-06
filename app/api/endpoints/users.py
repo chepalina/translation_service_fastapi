@@ -3,10 +3,11 @@ from sqlalchemy import delete, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.api import deps
+from app.api.schemas.requests import (UserCreateRequest,
+                                      UserUpdatePasswordRequest)
+from app.api.schemas.responses import UserResponse
 from app.core.security import get_password_hash
 from app.models import User
-from app.schemas.requests import UserCreateRequest, UserUpdatePasswordRequest
-from app.schemas.responses import UserResponse
 
 router = APIRouter()
 
