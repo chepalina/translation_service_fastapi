@@ -7,20 +7,36 @@ class DefinitionEntity(BaseModel):
     definition: str
     language: str
 
+    class Config:
+        orm_mode = True
+        from_attributes = True
+
 
 class SynonymEntity(BaseModel):
     synonym: str
     language: str
+
+    class Config:
+        orm_mode = True
+        from_attributes = True
 
 
 class TranslationEntity(BaseModel):
     translation: str
     language: str
 
+    class Config:
+        orm_mode = True
+        from_attributes = True
+
 
 class ExampleEntity(BaseModel):
     example: str
     language: str
+
+    class Config:
+        orm_mode = True
+        from_attributes = True
 
 
 class WordEntity(BaseModel):
@@ -30,6 +46,10 @@ class WordEntity(BaseModel):
     synonyms: List[SynonymEntity] = []
     translations: List[TranslationEntity] = []
     examples: List[ExampleEntity] = []
+
+    class Config:
+        orm_mode = True
+        from_attributes = True
 
     def add_definition(self, definition: DefinitionEntity):
         self.definitions.append(definition)

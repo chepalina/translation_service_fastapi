@@ -16,3 +16,18 @@ else:
 
 async_engine = create_async_engine(sqlalchemy_database_uri, pool_pre_ping=True)
 async_session = async_sessionmaker(async_engine, expire_on_commit=False)
+
+
+from collections.abc import AsyncIterator
+from contextlib import asynccontextmanager
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
+
+
+@asynccontextmanager
+async def get_context() -> AsyncIterator["AsyncSession"]:
+    """Контекстный менеджер для создания сессии."""
+    async with async_session.begin() as session:
+        yield session
