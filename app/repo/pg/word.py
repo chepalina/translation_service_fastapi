@@ -2,10 +2,16 @@ from collections.abc import Callable
 from contextlib import AbstractAsyncContextManager
 from dataclasses import dataclass
 from typing import TYPE_CHECKING
-from app.models import Word as WordModel
-from app.domain.entities import WordEntity
+
 from sqlalchemy import select
-from sqlalchemy.orm import joinedload
+from sqlalchemy.orm import contains_eager
+
+from app.domain.entities import WordEntity
+from app.models import Definition as DefinitionModel
+from app.models import Example as ExampleModel
+from app.models import Synonym as SynonymModel
+from app.models import Translation as TranslationModel
+from app.models import Word as WordModel
 
 if TYPE_CHECKING:
     from sqlalchemy.ext.asyncio import AsyncSession
@@ -18,19 +24,41 @@ class WordPgRepo:
     _session_factory: Callable[[], AbstractAsyncContextManager["AsyncSession"]]
 
     async def get(self, word: str, sl: str, tl: str) -> WordEntity:
-        """Get word entity from database.
-
-        For now just take all known relations.
-        TODO: Need to be filtered by language.
-        """
+        """Get word entity from database."""
         async with self._session_factory() as session:
 
+            # do an inner join with the table defenition with the assumption,
+            # that the absence of a defenition means the absence of a translation
+            # left join for other cases
             query = (
                 select(WordModel)
-                .options(joinedload(WordModel.definitions))
-                .options(joinedload(WordModel.synonyms))
-                .options(joinedload(WordModel.translations))
-                .options(joinedload(WordModel.examples))
+                .join(
+                    DefinitionModel,
+                    (WordModel.word_id == DefinitionModel.word_id)
+                    & (DefinitionModel.language == tl),
+                )
+                .options(contains_eager(WordModel.definitions))
+                .join(
+                    SynonymModel,
+                    (WordModel.word_id == SynonymModel.word_id)
+                    & (SynonymModel.language == tl),
+                    isouter=True,
+                )
+                .options(contains_eager(WordModel.synonyms))
+                .join(
+                    TranslationModel,
+                    (WordModel.word_id == TranslationModel.word_id)
+                    & (TranslationModel.language == tl),
+                    isouter=True,
+                )
+                .options(contains_eager(WordModel.translations))
+                .join(
+                    ExampleModel,
+                    (WordModel.word_id == ExampleModel.word_id)
+                    & (ExampleModel.language == tl),
+                    isouter=True,
+                )
+                .options(contains_eager(WordModel.examples))
                 .where(WordModel.word == word)
             )
 
