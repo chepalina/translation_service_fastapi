@@ -3,8 +3,9 @@ from contextlib import AbstractAsyncContextManager
 from dataclasses import dataclass
 from typing import TYPE_CHECKING
 
-from sqlalchemy import select
+from sqlalchemy import delete, select
 from sqlalchemy.orm import contains_eager
+from sqlalchemy.orm.exc import MultipleResultsFound
 
 from app.domain.entities import WordEntity
 from app.models import Definition as DefinitionModel
@@ -15,6 +16,12 @@ from app.models import Word as WordModel
 
 if TYPE_CHECKING:
     from sqlalchemy.ext.asyncio import AsyncSession
+
+
+class UndefinedWordException(BaseException):
+    """Cannot define word by given parameters."""
+
+    pass
 
 
 @dataclass
@@ -69,6 +76,43 @@ class WordPgRepo:
             word = result.scalars().first()
 
             return WordEntity.model_validate(word) if word else None
+
+    async def get_id(self, word: str, sl: str) -> int:
+        async with self._session_factory() as session:
+            query = select(WordModel.word_id).where(WordModel.word == word)
+
+            if sl != "auto":
+                query = query.where(WordModel.language == sl)
+
+            result = await session.execute(query)
+
+            try:
+                id = result.one_or_none()
+            except MultipleResultsFound:
+                raise UndefinedWordException(
+                    "Cannot define word by given parameters. Multiple words were found."
+                ) from MultipleResultsFound
+            return id[0] if id else None
+
+    async def delete(self, word_id: int) -> None:
+        """Get word entity from database."""
+
+        async with self._session_factory() as session:
+            # This one should be improved by delete cascade.
+            # Due to problems with cascade declaration here is a fast approach
+            await session.execute(
+                delete(ExampleModel).where(WordModel.word_id == word_id)
+            )
+            await session.execute(
+                delete(TranslationModel).where(WordModel.word_id == word_id)
+            )
+            await session.execute(
+                delete(SynonymModel).where(WordModel.word_id == word_id)
+            )
+            await session.execute(
+                delete(DefinitionModel).where(WordModel.word_id == word_id)
+            )
+            await session.execute(delete(WordModel).where(WordModel.word_id == word_id))
 
 
 # from app.core.session import get_context

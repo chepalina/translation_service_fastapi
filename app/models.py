@@ -44,11 +44,15 @@ class Word(Base):
     language = Column(String(50), nullable=False)
     last_updated = Column(DateTime, default=datetime.utcnow)
 
-    # Relationships
-    definitions = relationship("Definition", back_populates="word")
-    synonyms = relationship("Synonym", back_populates="word")
-    translations = relationship("Translation", back_populates="word")
-    examples = relationship("Example", back_populates="word")
+    # Relationships with cascade delete
+    definitions = relationship(
+        "Definition", back_populates="word", cascade="all, delete"
+    )
+    synonyms = relationship("Synonym", back_populates="word", cascade="all, delete")
+    translations = relationship(
+        "Translation", back_populates="word", cascade="all, delete"
+    )
+    examples = relationship("Example", back_populates="word", cascade="all, delete")
 
 
 class Definition(Base):

@@ -11,6 +11,7 @@ from app.core import config, security
 from app.core.session import async_session, get_context
 from app.models import User
 from app.repo.pg.word import WordPgRepo
+from app.repo.word import WordRepo
 
 reusable_oauth2 = OAuth2PasswordBearer(tokenUrl="auth/access-token")
 
@@ -55,5 +56,6 @@ async def get_current_user(
     return user
 
 
-def get_word_repo() -> "WordPgRepo":
-    return WordPgRepo(_session_factory=get_context)
+def get_word_repo() -> "WordRepo":
+    pg_repo = WordPgRepo(_session_factory=get_context)
+    return WordRepo(pg_repo=pg_repo)
