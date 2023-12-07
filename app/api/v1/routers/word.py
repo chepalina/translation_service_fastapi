@@ -3,7 +3,6 @@ from http import HTTPStatus
 from fastapi import APIRouter, Depends, HTTPException, Path, Query
 
 from app.api.deps import WordRepo, get_word_repo
-from app.api.v1.mapper import map_word
 from app.api.v1.schemas import WordSchema
 
 TAG = "word"
@@ -24,7 +23,7 @@ async def get_word(
     if not word:
         raise HTTPException(status_code=HTTPStatus.NOT_FOUND, detail="Word not found")
 
-    return map_word(word)
+    return word
 
 
 @router.delete("/word/{word_text}", status_code=HTTPStatus.NO_CONTENT)
