@@ -36,7 +36,7 @@ class WordRepo:
         include_synonyms: Optional[bool] = False,
         include_translations: Optional[bool] = False,
         include_examples: Optional[bool] = False,
-    ) -> list["WordEntity"]:
+    ) -> list["WordModel"]:
 
         return await self.pg_repo.get_pages(
             page,

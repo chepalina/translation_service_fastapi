@@ -123,7 +123,7 @@ class WordPgRepo:
         include_synonyms: Optional[bool] = False,
         include_translations: Optional[bool] = False,
         include_examples: Optional[bool] = False,
-    ) -> list["WordEntity"]:
+    ) -> list["WordModel"]:
 
         async with self._session_factory() as session:
             stmt = select(WordModel).order_by(WordModel.word)
@@ -143,9 +143,9 @@ class WordPgRepo:
             stmt = stmt.offset((page - 1) * page_size).limit(page_size)
 
             result = await session.execute(stmt)
-            words = result.unique().scalars().all()
 
-            return [WordEntity.model_validate(word) for word in words]
+            return result.unique().scalars().all()
+            # return [WordEntity.model_validate(word) for word in words]
 
 
 # from app.core.session import get_context
