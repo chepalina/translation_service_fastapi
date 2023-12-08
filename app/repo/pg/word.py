@@ -1,10 +1,10 @@
 from collections.abc import Callable
 from contextlib import AbstractAsyncContextManager
 from dataclasses import dataclass
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Optional
 
 from sqlalchemy import delete, select
-from sqlalchemy.orm import contains_eager
+from sqlalchemy.orm import contains_eager, joinedload
 from sqlalchemy.orm.exc import MultipleResultsFound
 
 from app.domain.entities import WordEntity
@@ -113,6 +113,39 @@ class WordPgRepo:
                 delete(DefinitionModel).where(WordModel.word_id == word_id)
             )
             await session.execute(delete(WordModel).where(WordModel.word_id == word_id))
+
+    async def get_pages(
+        self,
+        page: int,
+        page_size: int = 10,
+        word_filter: Optional[str] = None,
+        include_definitions: Optional[bool] = False,
+        include_synonyms: Optional[bool] = False,
+        include_translations: Optional[bool] = False,
+        include_examples: Optional[bool] = False,
+    ) -> list["WordEntity"]:
+
+        async with self._session_factory() as session:
+            stmt = select(WordModel).order_by(WordModel.word)
+
+            if word_filter:
+                stmt = stmt.where(WordModel.word.ilike(f"%{word_filter}%"))
+
+            if include_definitions:
+                stmt = stmt.options(joinedload(WordModel.definitions))
+            if include_synonyms:
+                stmt = stmt.options(joinedload(WordModel.synonyms))
+            if include_translations:
+                stmt = stmt.options(joinedload(WordModel.translations))
+            if include_examples:
+                stmt = stmt.options(joinedload(WordModel.examples))
+
+            stmt = stmt.offset((page - 1) * page_size).limit(page_size)
+
+            result = await session.execute(stmt)
+            words = result.unique().scalars().all()
+
+            return [WordEntity.model_validate(word) for word in words]
 
 
 # from app.core.session import get_context

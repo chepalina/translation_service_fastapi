@@ -59,3 +59,7 @@ async def get_current_user(
 def get_word_repo() -> "WordRepo":
     pg_repo = WordPgRepo(_session_factory=get_context)
     return WordRepo(pg_repo=pg_repo)
+
+
+def get_strawberry_context() -> dict[str, "WordRepo"]:
+    yield {"word_repo": get_word_repo()}

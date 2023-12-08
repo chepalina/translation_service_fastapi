@@ -1,4 +1,5 @@
 from dataclasses import dataclass
+from typing import Optional
 
 from app.domain.entities import WordEntity
 from app.repo.pg.word import WordPgRepo
@@ -25,3 +26,24 @@ class WordRepo:
             return
 
         await self.pg_repo.delete(id)
+
+    async def get_pages(
+        self,
+        page: int,
+        page_size: int = 10,
+        word_filter: Optional[str] = None,
+        include_definitions: Optional[bool] = False,
+        include_synonyms: Optional[bool] = False,
+        include_translations: Optional[bool] = False,
+        include_examples: Optional[bool] = False,
+    ) -> list["WordEntity"]:
+
+        return await self.pg_repo.get_pages(
+            page,
+            page_size,
+            word_filter,
+            include_definitions,
+            include_synonyms,
+            include_translations,
+            include_examples,
+        )

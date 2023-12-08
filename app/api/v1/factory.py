@@ -25,4 +25,6 @@ def create_app(title: str, version: str) -> FastAPI:
     # Добавление роутеров
     api_v1.include_router(word.router)
 
+    api_v1.include_router(word.graphql_router, prefix="/graphql")
+
     return api_v1

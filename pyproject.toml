@@ -17,6 +17,7 @@ pyjwt = { extras = ["crypto"], version = "^2.8.0" }
 python-multipart = "^0.0.6"
 sqlalchemy = "^2.0.23"
 toml = "^0.10.2"
+strawberry_graphql = "^0.216.0"
 
 [tool.poetry.group.dev.dependencies]
 black = "^23.10.1"
