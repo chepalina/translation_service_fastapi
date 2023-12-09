@@ -18,7 +18,7 @@ router = APIRouter(prefix=PREFIX, tags=[TAG])
 @router.get("/{word_text}", response_model=WordSchema)
 async def get_word(
     word_text: str,
-    sl: str = "auto",
+    sl: str = Query(..., description="Source language"),
     tl: str = Query(..., description="Target language"),
     repo: "WordRepo" = Depends(get_word_repo),
 ):

@@ -2,6 +2,7 @@ from dataclasses import dataclass
 from typing import Optional
 
 from app.domain.entities import WordEntity
+from app.repo.google.word import GoogleWordRepo
 from app.repo.pg.word import WordPgRepo
 
 
@@ -10,9 +11,18 @@ class WordRepo:
     """Access to word entity."""
 
     pg_repo: "WordPgRepo"
+    google_repo: "GoogleWordRepo"
 
     async def get(self, word: str, sl: str, tl: str) -> WordEntity:
-        return await self.pg_repo.get(word, sl, tl)
+        word_entity = await self.pg_repo.get(word, sl, tl)
+
+        if word_entity is None:
+            word_entity = await self.google_repo.get(word, sl, tl)
+
+        if word_entity:
+            await self.pg_repo.save(word_entity)
+
+        return word_entity
 
     async def delete(self, word: str, sl: str) -> None:
         """Idempotent delete function.

@@ -1,6 +1,5 @@
 import requests
 
-
 query = """
 query GetWords($page: Int, $pageSize: Int, $wordFilter: String, $includeDefinitions: Boolean, 
 $includeSynonyms: Boolean, $includeTranslations: Boolean, $includeExamples: Boolean) {

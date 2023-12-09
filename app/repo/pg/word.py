@@ -4,6 +4,7 @@ from dataclasses import dataclass
 from typing import TYPE_CHECKING, Optional
 
 from sqlalchemy import delete, select
+from sqlalchemy.dialects.postgresql import insert
 from sqlalchemy.orm import contains_eager, joinedload
 from sqlalchemy.orm.exc import MultipleResultsFound
 
@@ -147,10 +148,81 @@ class WordPgRepo:
             return result.unique().scalars().all()
             # return [WordEntity.model_validate(word) for word in words]
 
+    async def save(self, word: WordEntity):
+
+        async with self._session_factory() as session:
+            # Check if the word already exists
+            stmt = select(WordModel).where(
+                WordModel.word == word.word, WordModel.language == word.language
+            )
+            result = await session.execute(stmt)
+            word_record = result.scalar_one_or_none()
+
+            if word_record is None:
+                # Create a new WordModel instance
+                word_record = WordModel(word=word.word, language=word.language)
+                session.add(word_record)
+                await session.commit()
+
+        async with self._session_factory() as session:
+
+            # Insert/Ignore Definitions
+            for definition in word.definitions:
+                insert_stmt = insert(DefinitionModel).values(
+                    definition=definition.definition,
+                    word_id=word_record.word_id,
+                    language=definition.language,
+                )
+                await session.execute(insert_stmt.on_conflict_do_nothing())
+
+            # Insert/Ignore Synonyms
+            for synonym in word.synonyms:
+                insert_stmt = insert(SynonymModel).values(
+                    synonym=synonym.synonym,
+                    word_id=word_record.word_id,
+                    language=synonym.language,
+                )
+                await session.execute(insert_stmt.on_conflict_do_nothing())
+
+            # Insert/Ignore Translations
+            for translation in word.translations:
+                insert_stmt = insert(TranslationModel).values(
+                    translation=translation.translation,
+                    word_id=word_record.word_id,
+                    language=translation.language,
+                )
+                await session.execute(insert_stmt.on_conflict_do_nothing())
+
+            # Insert/Ignore Examples
+            for example in word.examples:
+                insert_stmt = insert(ExampleModel).values(
+                    example=example.example,
+                    word_id=word_record.word_id,
+                    language=example.language,
+                )
+                await session.execute(insert_stmt.on_conflict_do_nothing())
+
+            await session.commit()
+
 
 # from app.core.session import get_context
 # from asyncio import run
 # repo = WordPgRepo(_session_factory=get_context)
-# w = run(repo.get("apple"))
+# # w = run(repo.get("apple"))
+# #
+# # print(w)
 #
-# print(w)
+# from app.domain.entities import *
+#
+#
+# async def main():
+#     word_entity = WordEntity(
+#             word="example",
+#             language="en",
+#             synonyms=[SynonymEntity(synonym="sample", language="en")],
+#             translations=[TranslationEntity(translation="ejemplo", language="es")],
+#             examples=[ExampleEntity(example="This is an example.", language="en")]
+#         )
+#     await repo.save(word_entity)
+#
+# run(main())

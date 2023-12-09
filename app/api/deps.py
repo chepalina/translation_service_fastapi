@@ -10,6 +10,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.core import config, security
 from app.core.session import async_session, get_context
 from app.models import User
+from app.repo.google.word import GoogleWordRepo
 from app.repo.pg.word import WordPgRepo
 from app.repo.word import WordRepo
 
@@ -58,7 +59,7 @@ async def get_current_user(
 
 def get_word_repo() -> "WordRepo":
     pg_repo = WordPgRepo(_session_factory=get_context)
-    return WordRepo(pg_repo=pg_repo)
+    return WordRepo(pg_repo=pg_repo, google_repo=GoogleWordRepo())
 
 
 def get_strawberry_context() -> dict[str, "WordRepo"]:

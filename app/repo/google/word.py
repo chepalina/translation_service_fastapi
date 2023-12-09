@@ -12,7 +12,7 @@ from app.domain.entities import (DefinitionEntity, ExampleEntity,
 
 
 @dataclass
-class GoogleTranslateWordRepo:
+class GoogleWordRepo:
     """Google Translate scrapper."""
 
     operation: str = "translate"

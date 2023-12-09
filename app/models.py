@@ -16,7 +16,8 @@ alembic upgrade head
 import uuid
 from datetime import datetime
 
-from sqlalchemy import Column, DateTime, ForeignKey, Integer, String, Text
+from sqlalchemy import (Column, DateTime, ForeignKey, Integer, String, Text,
+                        UniqueConstraint)
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship
 
@@ -62,6 +63,12 @@ class Definition(Base):
     language = Column(String(50), nullable=False)
     definition = Column(Text, nullable=False)
 
+    __table_args__ = (
+        UniqueConstraint(
+            "word_id", "language", "definition", name="_word_language_definition_uc"
+        ),
+    )
+
     # Relationship
     word = relationship("Word", back_populates="definitions")
 
@@ -73,6 +80,11 @@ class Synonym(Base):
     language = Column(String(50), nullable=False)
     synonym = Column(Text, nullable=False)
 
+    __table_args__ = (
+        UniqueConstraint(
+            "word_id", "language", "synonym", name="_word_language_synonym_uc"
+        ),
+    )
     # Relationship
     word = relationship("Word", back_populates="synonyms")
 
@@ -84,6 +96,12 @@ class Translation(Base):
     language = Column(String(50), nullable=False)
     translation = Column(Text, nullable=False)
 
+    __table_args__ = (
+        UniqueConstraint(
+            "word_id", "language", "translation", name="_word_language_translation_uc"
+        ),
+    )
+
     # Relationship
     word = relationship("Word", back_populates="translations")
 
@@ -94,6 +112,12 @@ class Example(Base):
     word_id = Column(Integer, ForeignKey("words.word_id"))
     language = Column(String(50), nullable=False)
     example = Column(Text, nullable=False)
+
+    __table_args__ = (
+        UniqueConstraint(
+            "word_id", "language", "example", name="_word_language_example_uc"
+        ),
+    )
 
     # Relationship
     word = relationship("Word", back_populates="examples")
