@@ -7,7 +7,8 @@ from selenium.common.exceptions import (NoSuchElementException,
                                         TimeoutException, WebDriverException)
 from selenium.webdriver.common.by import By
 
-from app.domain.entities import WordEntity
+from app.domain.entities import (DefinitionEntity, ExampleEntity,
+                                 SynonymEntity, TranslationEntity, WordEntity)
 
 
 @dataclass
@@ -34,10 +35,10 @@ class GoogleTranslateWordRepo:
             # wait for page loading
             await asyncio.sleep(3)
 
-            word_entity.definitions = self._get_definitions(driver)
-            word_entity.synonyms = self._get_synonyms(driver)
-            word_entity.translations = self._get_translations(driver)
-            word_entity.examples = self._get_examples(driver)
+            word_entity.definitions = self._get_definitions(driver, tl)
+            word_entity.synonyms = self._get_synonyms(driver, tl)
+            word_entity.translations = self._get_translations(driver, tl)
+            word_entity.examples = self._get_examples(driver, tl)
 
         except TimeoutException:
             return None
@@ -51,39 +52,49 @@ class GoogleTranslateWordRepo:
     def _get_link(self, word: str, sl: str, tl: str) -> str:
         return f"https://translate.google.com/?sl={sl}&tl={tl}&text={word}&op={self.operation}"
 
-    def _get_definitions(self, driver) -> list[str]:
+    def _get_definitions(
+        self, driver: "webdriver.Chrome", tl: str
+    ) -> list[DefinitionEntity]:
 
         try:
             translation = driver.find_element(By.CLASS_NAME, self.translation_class)
         except NoSuchElementException:
             return []
 
-        return [translation.text]
+        return [DefinitionEntity(definition=translation.text, language=tl)]
 
-    def _get_translations(self, driver) -> list[str]:
+    def _get_translations(
+        self, driver: "webdriver.Chrome", tl: str
+    ) -> list["TranslationEntity"]:
 
         try:
             translations = driver.find_elements(By.CLASS_NAME, self.translation_class)
         except NoSuchElementException:
             return []
 
-        return list({t.text for t in translations})[1:]
+        return [
+            TranslationEntity(translation=t, language=tl)
+            for t in self._clean(translations)
+        ][1:]
 
-    def _get_examples(self, driver) -> list[str]:
+    def _get_examples(self, driver: "webdriver.Chrome", tl: str) -> list[ExampleEntity]:
         try:
             examples = driver.find_elements(By.CLASS_NAME, self.example_class)
         except NoSuchElementException:
             return []
 
-        return list({e.text for e in examples})
+        return [ExampleEntity(example=e, language=tl) for e in self._clean(examples)]
 
-    def _get_synonyms(self, driver) -> list[str]:
+    def _get_synonyms(self, driver: "webdriver.Chrome", tl: str) -> list[SynonymEntity]:
         try:
             synonyms = driver.find_elements(By.CLASS_NAME, self.synonym_class)
         except NoSuchElementException:
             return []
 
-        return list({s.text for s in synonyms})
+        return [SynonymEntity(synonym=s, language=tl) for s in self._clean(synonyms)]
+
+    def _clean(self, results: list) -> set:
+        return {r.text for r in results if r.text}
 
 
 # from asyncio import run
