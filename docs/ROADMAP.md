@@ -1,14 +1,14 @@
-#Translation Service - Development Roadmap
-##Introduction
+# Translation Service - Development Roadmap
+## Introduction
 This document outlines the future development plans for the Translation Service. The roadmap includes both functional and non-functional improvements aimed at enhancing the service's capabilities, reliability, and performance.
 
-##Functional Enhancements
+## Functional Enhancements
 #### 1. Scrapping Improvement:
 
 - Refine the scrapping accuracy, specifically in more precisely identifying the 'definition' block.
 - Enhance requirement specifications to improve scrapping capabilities.
 
-####2. Language Auto-Detection Support:
+#### 2. Language Auto-Detection Support:
 
 - Implement functionality to automatically detect the language of input text.
 
@@ -30,7 +30,7 @@ This document outlines the future development plans for the Translation Service.
 - Extend the existing unit tests, currently focused on the WordPgRepo class, to cover more components and scenarios.
 
 
-##Non-Functional Improvements
+## Non-Functional Improvements
 
 #### 1. Database Partitioning:
 
@@ -54,7 +54,7 @@ This document outlines the future development plans for the Translation Service.
 
 - Implement comprehensive logging mechanisms to facilitate effective debugging and issue resolution.
 
-#### 2.2 Monitoring:
+#### 2 Monitoring:
 
 - Set up robust monitoring systems to track the application's performance and health in real-time.
 
