@@ -32,7 +32,13 @@ class WordPgRepo:
     _session_factory: Callable[[], AbstractAsyncContextManager["AsyncSession"]]
 
     async def get(self, word: str, sl: str, tl: str) -> WordEntity:
-        """Get word entity from database."""
+        """Retrieves a WordEntity from the database based on the provided word, source
+        language (sl), and target language (tl). The method performs an inner join with
+        the DefinitionModel to ensure the existence of a definition for the word in the target
+        language, which implies the presence of a translation.
+        Synonyms, translations, and examples are joined using left joins, allowing
+        their absence.
+        """
         async with self._session_factory() as session:
 
             # do an inner join with the table defenition with the assumption,
@@ -79,6 +85,11 @@ class WordPgRepo:
             return WordEntity.model_validate(word) if word else None
 
     async def get_id(self, word: str, sl: str) -> int:
+        """Retrieves the unique identifier (ID) of a word from the database based on
+        the specified word and source language (sl).
+        This method is designed to fetch the ID of a word where the word and
+        its language match the given parameters.
+        """
         async with self._session_factory() as session:
             query = select(WordModel.word_id).where(WordModel.word == word)
 
@@ -96,7 +107,14 @@ class WordPgRepo:
             return id[0] if id else None
 
     async def delete(self, word_id: int) -> None:
-        """Get word entity from database."""
+        """Deletes a word and its related data (definitions, synonyms, translations,
+            and examples) from the database based on the provided word ID.
+
+        This method executes multiple delete operations to remove all associated data
+        from the related tables (ExampleModel, TranslationModel, SynonymModel, DefinitionModel)
+        before finally deleting the word from the WordModel. The deletions are not done via
+        cascade delete in the database, but rather through individual delete statements
+        in this method."""
 
         async with self._session_factory() as session:
             # This one should be improved by delete cascade.
@@ -125,6 +143,13 @@ class WordPgRepo:
         include_translations: Optional[bool] = False,
         include_examples: Optional[bool] = False,
     ) -> list["WordModel"]:
+        """Retrieves a paginated list of words from the database,
+        with optional filters and related data.
+
+        This method supports pagination, filtering by a word substring, and optional inclusion of
+        related data such as definitions, synonyms, translations, and examples. The related data
+        is included based on the respective boolean flags.
+        """
 
         async with self._session_factory() as session:
             stmt = select(WordModel).order_by(WordModel.word)
@@ -149,6 +174,12 @@ class WordPgRepo:
             # return [WordEntity.model_validate(word) for word in words]
 
     async def save(self, word: WordEntity):
+        """Saves a WordEntity instance into the database.
+
+        If the word already exists in the database, this method will skip creating a new entry.
+        If the word does not exist, it creates a new WordModel instance and
+        saves it to the database.
+        """
 
         async with self._session_factory() as session:
             # Check if the word already exists
