@@ -6,6 +6,7 @@ from selenium import webdriver
 from selenium.common.exceptions import (NoSuchElementException,
                                         TimeoutException, WebDriverException)
 from selenium.webdriver.common.by import By
+from selenium.webdriver.chrome.options import Options
 
 from app.domain.entities import (DefinitionEntity, ExampleEntity,
                                  SynonymEntity, TranslationEntity, WordEntity)
@@ -25,7 +26,8 @@ class GoogleWordRepo:
 
         # here is a bug with auto sl
         link = self._get_link(word, sl, tl)
-        driver = webdriver.Chrome()
+        options = self._get_options()
+        driver = webdriver.Chrome(options=options)
         word_entity = WordEntity(word=word, language=sl)
 
         try:
@@ -95,6 +97,14 @@ class GoogleWordRepo:
 
     def _clean(self, results: list) -> set:
         return {r.text for r in results if r.text}
+
+    def _get_options(self) -> "Options":
+        chrome_options = Options()
+        chrome_options.add_argument('--headless')
+        chrome_options.add_argument('--no-sandbox')
+        chrome_options.add_argument('--disable-gpu')
+        chrome_options.add_argument('--disable-dev-shm-usage')
+        return chrome_options
 
 
 # from asyncio import run
