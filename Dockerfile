@@ -2,7 +2,6 @@ FROM python:3.10-slim-bullseye
 
 # Install utilities
 RUN apt-get update && apt-get install -y \
-    curl \
     wget \
     gnupg \
     software-properties-common \
@@ -10,18 +9,13 @@ RUN apt-get update && apt-get install -y \
     unzip \
     && rm -rf /var/lib/apt/lists/*
 
-# Install Chrome
+## Install Chrome
 RUN wget -q -O - https://dl-ssl.google.com/linux/linux_signing_key.pub | apt-key add - \
     && sh -c 'echo "deb [arch=amd64] http://dl.google.com/linux/chrome/deb/ stable main" >> /etc/apt/sources.list.d/google.list' \
     && apt-get update \
     && apt-get install -y google-chrome-stable \
     && rm -rf /var/lib/apt/lists/*
 
-# Install Chrome WebDriver
-RUN CHROMEDRIVER_VERSION=`curl -sS chromedriver.storage.googleapis.com/LATEST_RELEASE` && \
-    wget -N http://chromedriver.storage.googleapis.com/$CHROMEDRIVER_VERSION/chromedriver_linux64.zip -P /tmp \
-    && unzip /tmp/chromedriver_linux64.zip -d /usr/local/bin/ \
-    && rm /tmp/chromedriver_linux64.zip
 
 # Set display port as an environment variable
 ENV DISPLAY=:99
