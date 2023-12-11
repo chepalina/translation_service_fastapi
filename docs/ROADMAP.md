@@ -29,6 +29,9 @@ This document outlines the future development plans for the Translation Service.
 
 - Extend the existing unit tests, currently focused on the WordPgRepo class, to cover more components and scenarios.
 
+#### 7. Avoiding blocking operations:
+
+- Selenium.webdriver.get blocks all the program.
 
 ## Non-Functional Improvements
 

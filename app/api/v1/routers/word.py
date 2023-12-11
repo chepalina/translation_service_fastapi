@@ -9,7 +9,7 @@ from app.api.deps import WordRepo, get_strawberry_context, get_word_repo
 from app.api.v1.schemas import WordSchema
 from app.api.v1.types import WordType
 
-TAG = "word"
+TAG = "words"
 PREFIX = f"/{TAG}"
 
 router = APIRouter(prefix=PREFIX, tags=[TAG])
@@ -30,7 +30,7 @@ async def get_word(
     return word
 
 
-@router.delete("/word/{word_text}", status_code=HTTPStatus.NO_CONTENT)
+@router.delete("/{word_text}", status_code=HTTPStatus.NO_CONTENT)
 async def delete_word(
     word_text: str = Path(..., description="Word to delete"),
     sl: str = "auto",
