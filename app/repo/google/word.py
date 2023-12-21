@@ -105,14 +105,3 @@ class GoogleWordRepo:
         chrome_options.add_argument('--disable-gpu')
         chrome_options.add_argument('--disable-dev-shm-usage')
         return chrome_options
-
-
-# from asyncio import run
-#
-# async def main():
-#     g = GoogleTranslateWordRepo()
-#
-#     word = await g.get("challenge", "en", "fr")
-#     print(word)
-#
-# run(main())

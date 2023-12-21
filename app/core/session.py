@@ -28,6 +28,5 @@ if TYPE_CHECKING:
 
 @asynccontextmanager
 async def get_context() -> AsyncIterator["AsyncSession"]:
-    """Контекстный менеджер для создания сессии."""
     async with async_session.begin() as session:
         yield session

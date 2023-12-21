@@ -234,26 +234,3 @@ class WordPgRepo:
                 await session.execute(insert_stmt.on_conflict_do_nothing())
 
             await session.commit()
-
-
-# from app.core.session import get_context
-# from asyncio import run
-# repo = WordPgRepo(_session_factory=get_context)
-# # w = run(repo.get("apple"))
-# #
-# # print(w)
-#
-# from app.domain.entities import *
-#
-#
-# async def main():
-#     word_entity = WordEntity(
-#             word="example",
-#             language="en",
-#             synonyms=[SynonymEntity(synonym="sample", language="en")],
-#             translations=[TranslationEntity(translation="ejemplo", language="es")],
-#             examples=[ExampleEntity(example="This is an example.", language="en")]
-#         )
-#     await repo.save(word_entity)
-#
-# run(main())
